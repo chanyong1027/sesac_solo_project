@@ -15,7 +15,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @RequiredArgsConstructor
-public class MusicalStepConfig {
+public class PerformanceStepConfig {
 
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;

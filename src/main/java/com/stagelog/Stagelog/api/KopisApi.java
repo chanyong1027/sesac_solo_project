@@ -10,18 +10,14 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Slf4j
 @Component
 public class KopisApi {
 
+    // KOPIS API 한 번 호출 시 최대 100개 조회 가능
     private static final int ROWS_PER_PAGE = 100;
-    //private static final String PRF_STATE_RUNNING = "01";
-    private static final String SEOUL_CODE = "11";
-    private static final String CATEGORY_MUSICAL = "CCCD";
     private static final String BASE_URL = "http://www.kopis.or.kr";
 
     @Value("${external.kopis}")
@@ -34,24 +30,18 @@ public class KopisApi {
                 .build();
     }
 
-    public List<KopisPerformanceApiDto> fetchPerformances(int cpage){
+    public List<KopisPerformanceApiDto> fetchPerformances(String startDate, String endDate, int currentPage, String category) {
 
         try{
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-            LocalDate now = LocalDate.now();
-
-            String startDate = now.plusMonths(1).format(formatter);
-            String endDate = now.plusMonths(2).format(formatter);
 
             String uri = UriComponentsBuilder
                     .fromPath("/openApi/restful/pblprfr")
                     .queryParam("service", apiKey)
                     .queryParam("stdate", startDate)
                     .queryParam("eddate", endDate)
-                    .queryParam("cpage", cpage)
+                    .queryParam("cpage", currentPage)
                     .queryParam("rows", ROWS_PER_PAGE)
-                    .queryParam("signgucode", SEOUL_CODE)
-                    .queryParam("shcate", CATEGORY_MUSICAL)
+                    .queryParam("shcate", category)
                     .build(true)
                     .toString();
 
@@ -67,7 +57,7 @@ public class KopisApi {
             return response.getPerformances();
         }
         catch (RestClientException e){
-            log.error("Kopis api 호출 중 오류 발생: cpage={}", cpage, e);
+            log.error("Kopis api 호출 중 오류 발생: cpage={}", currentPage, e);
             return Collections.emptyList();
         }
     }

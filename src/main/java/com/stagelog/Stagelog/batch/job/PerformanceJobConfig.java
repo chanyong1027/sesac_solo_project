@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @RequiredArgsConstructor
-public class MusicalJobConfig {
+public class PerformanceJobConfig {
 
     private final JobRepository jobRepository;
     private final Step musicalFetchStep;

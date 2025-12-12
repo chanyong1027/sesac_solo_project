@@ -7,6 +7,6 @@ import com.stagelog.Stagelog.dto.KopisPerformanceDetailResponseDto;
 import java.util.List;
 
 public interface KopisPerformanceDataProvider {
-    List<KopisPerformanceApiDto> fetchPerformances(int page);
+    List<KopisPerformanceApiDto> fetchPerformances(String startDate, String endDate, int currentPage, String category);
     KopisPerformanceDetailResponseDto fetchPerformanceDetail(String mt20id);
 }
