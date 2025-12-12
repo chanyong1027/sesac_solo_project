@@ -1,5 +1,6 @@
 package com.stagelog.Stagelog.batch.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.stagelog.Stagelog.domain.KopisPerformance;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,12 +16,13 @@ public class KopisPerformanceApiDto {
     private String fcltynm; // 공연장명
     private String prfstate; // 공연 상태
     private String poster; // 포스터
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
     private LocalDate prfpdfrom; // 공연 시작일
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
     private LocalDate prfpdto;
 
     public KopisPerformance toEntity() {
         return KopisPerformance.builder()
-                .id(this.mcode)
                 .kopisId(this.mt20id)
                 .title(this.prfnm)
                 .venue(this.fcltynm)

@@ -13,12 +13,12 @@ import org.springframework.context.annotation.Configuration;
 public class PerformanceJobConfig {
 
     private final JobRepository jobRepository;
-    private final Step musicalFetchStep;
+    private final Step performanceFetchStep;
 
     @Bean
-    public Job musicalFetchJob() {
-        return new JobBuilder("musicalFetchJob", jobRepository)
-                .start(musicalFetchStep)
+    public Job performanceFetchJob() {
+        return new JobBuilder("performanceFetchJob", jobRepository)
+                .start(performanceFetchStep)
                 .build();
     }
 }

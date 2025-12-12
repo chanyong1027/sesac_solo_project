@@ -141,7 +141,7 @@ public class PerformanceItemReader implements ItemReader<KopisPerformanceApiDto>
 
         public SearchPeriodCursor(LocalDate startDate) {
             this.currentStartDate = startDate;
-            this.searchEndDate = startDate.plusMonths(12);
+            this.searchEndDate = LocalDate.now().plusMonths(12);
         }
 
         public boolean isFinished() {

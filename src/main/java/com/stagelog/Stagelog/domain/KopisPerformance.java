@@ -1,5 +1,6 @@
 package com.stagelog.Stagelog.domain;
 
+import com.stagelog.Stagelog.dto.PerformanceDetailResponseDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "raw_performance")
@@ -26,9 +28,6 @@ public class KopisPerformance {
 
     @Column(name = "prfnm")
     private String title;
-
-    @Column(name = "prfcast")
-    private String cast;
 
     @Column(name = "poster")
     private String posterUrl;
@@ -53,6 +52,60 @@ public class KopisPerformance {
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    // --------상세 정보로 받아 올 필드들--------
+
+    @Column(name = "prfcast")
+    private String cast;
+
+    @Column(name = "prfruntime")
+    private String runtime;
+
+    @Column(name = "pcseguidance")
+    private String ticketPrice;
+
+    @Column(name = "area")
+    private String area;
+
+    @Column(name = "dtguidance")
+    private String performanceStartTime;
+
+    @Column(name = "visit")
+    private boolean isVisit;
+
+    @Column(name = "festival")
+    private boolean isFestival;
+
+    @Column(name = "relatenm")
+    private String ticketVendor;
+
+    @Column(name = "relateurl")
+    private String ticketUrl;
+
+    public void updateDetailInfo(PerformanceDetailResponseDto detail) {
+        if (detail == null) {
+            throw new IllegalArgumentException("상세 정보가 null일 수 없습니다");
+        }
+
+        this.title = detail.getPrfnm();
+        this.cast = detail.getPrfcast();
+        this.runtime = detail.getPrfruntime();
+        this.ticketPrice = detail.getPcseguidance();
+        this.performanceStartTime = detail.getDtguidance();
+        this.area = detail.getArea();
+        this.startDate = detail.getStartDate();
+        this.endDate = detail.getEndDate();
+        this.hasDetail = true;
+        this.isFestival = detail.isFestival();
+        this.isVisit = detail.isVisitPerformance();
+        this.ticketVendor = detail.getRelates().stream()
+                .map(PerformanceDetailResponseDto.RelateDto::getRelatenm)
+                .collect(Collectors.joining(", "));
+        this.ticketUrl = detail.getTicketLinks().stream()
+                .map(PerformanceDetailResponseDto.RelateDto::getRelateurl)
+                .filter(url -> url != null && !url.isEmpty())
+                .collect(Collectors.joining(", "));
+    }
 
     @PrePersist
     protected void onCreate() {

@@ -1,0 +1,21 @@
+package com.stagelog.Stagelog.batch.controller;
+
+import com.stagelog.Stagelog.batch.service.BatchService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/admin/batch")
+@RequiredArgsConstructor
+public class BatchController {
+    private final BatchService batchService;
+
+    @PostMapping("/run")
+    public String runBatch(@RequestParam(required = false) String startDate) {
+        batchService.runJob(startDate);
+        return "배치 실행 요청됨 (startDate: " + startDate + ")";
+    }
+}

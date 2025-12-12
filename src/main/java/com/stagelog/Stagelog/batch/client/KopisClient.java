@@ -3,6 +3,7 @@ package com.stagelog.Stagelog.batch.client;
 import com.stagelog.Stagelog.api.KopisApi;
 import com.stagelog.Stagelog.batch.dto.KopisPerformanceApiDto;
 import com.stagelog.Stagelog.dto.KopisPerformanceDetailResponseDto;
+import com.stagelog.Stagelog.dto.PerformanceDetailResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +21,7 @@ public class KopisClient implements KopisPerformanceDataProvider {
     }
 
     @Override
-    public KopisPerformanceDetailResponseDto fetchPerformanceDetail(String kopisId) {
+    public PerformanceDetailResponseDto fetchPerformanceDetail(String kopisId) {
         return kopisApi.fetchMusicalDetail(kopisId);
     }
 }

@@ -15,5 +15,9 @@ public class KopisPerformanceDetailResponseDto {
 
     @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty(localName = "db")
-    private List<KopisPerformanceDetailResponseDto> detail;
+    private List<PerformanceDetailResponseDto> details;
+
+    public PerformanceDetailResponseDto getFirstDetail() {
+        return (details != null && !details.isEmpty()) ? details.get(0) : null;
+    }
 }

@@ -26,8 +26,8 @@ public class PerformanceStepConfig {
     private static final int CHUNK_SIZE = 100;
 
     @Bean
-    public Step musicalFetchStep() {
-        return new StepBuilder("musicalFetchStep", jobRepository)
+    public Step performanceFetchStep() {
+        return new StepBuilder("performanceFetchStep", jobRepository)
                 .<KopisPerformanceApiDto, KopisPerformance>chunk(CHUNK_SIZE, transactionManager)
                 .reader(performanceItemReader)
                 .processor(performanceItemProcessor)
