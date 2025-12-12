@@ -90,6 +90,7 @@ public class KopisPerformance {
         this.title = detail.getPrfnm();
         this.cast = detail.getPrfcast();
         this.runtime = detail.getPrfruntime();
+        this.genre = detail.getGenrenm();
         this.ticketPrice = detail.getPcseguidance();
         this.performanceStartTime = detail.getDtguidance();
         this.area = detail.getArea();
@@ -110,5 +111,9 @@ public class KopisPerformance {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+    }
+
+    public void handleNoDetail() {
+        this.hasDetail = true;
     }
 }

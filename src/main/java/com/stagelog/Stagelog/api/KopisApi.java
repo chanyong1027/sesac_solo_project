@@ -64,7 +64,6 @@ public class KopisApi {
     }
 
     public PerformanceDetailResponseDto fetchMusicalDetail(String kopisId) {
-/*
         try {
             String uri = UriComponentsBuilder
                     .fromPath("/openApi/restful/pblprfr/{mt20id}")
@@ -72,14 +71,14 @@ public class KopisApi {
                     .buildAndExpand(kopisId)
                     .toString();
 
-            log.debug("KOPIS 상세 정보 조회 시작: kopisId={}", kopisId);
+            //log.debug("KOPIS 상세 정보 조회 시작: kopisId={}", kopisId);
 
             KopisPerformanceDetailResponseDto response = restClient.get()
                     .uri(uri)
                     .retrieve()
                     .body(KopisPerformanceDetailResponseDto.class);
 
-            if (response == null || response.getDetail() == null || response.getDetail().isEmpty()) {
+            if (response == null || response.getDetails() == null || response.getDetails().isEmpty()) {
                 log.warn("KOPIS API 응답이 null입니다: kopisId={}", kopisId);
                 return null;
             }
@@ -90,13 +89,12 @@ public class KopisApi {
                 return null;
             }
 
-            log.debug("상세 정보 조회 성공: kopisId={}, title={}", kopisId, detail.getPrfnm());
+            //log.debug("상세 정보 조회 성공: kopisId={}, title={}", kopisId, detail.getPrfnm());
             return detail;
 
         } catch (RestClientException e) {
             log.error("KOPIS 상세 API 호출 및 파싱 중 오류 발생: mt20id={}", kopisId, e);
             return null;
-        }*/
-        return null;
+        }
     }
 }

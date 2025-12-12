@@ -31,6 +31,7 @@ public class PerformanceDetailResponseDto {
     private String pcseguidance; //티켓 가격
     private String dtguidance; // 공연 시간
     private String prfruntime; // 공연 런타임
+    private String genrenm;
     private String area;
     private String visit;
     private String festival;

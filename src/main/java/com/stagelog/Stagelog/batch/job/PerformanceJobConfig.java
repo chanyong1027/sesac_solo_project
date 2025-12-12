@@ -14,11 +14,19 @@ public class PerformanceJobConfig {
 
     private final JobRepository jobRepository;
     private final Step performanceFetchStep;
+    private final Step performanceDetailStep;
 
     @Bean
     public Job performanceFetchJob() {
         return new JobBuilder("performanceFetchJob", jobRepository)
                 .start(performanceFetchStep)
+                .build();
+    }
+
+    @Bean
+    public Job performanceDetailJob() {
+        return new JobBuilder("performanceDetailJob", jobRepository)
+                .start(performanceDetailStep)
                 .build();
     }
 }
