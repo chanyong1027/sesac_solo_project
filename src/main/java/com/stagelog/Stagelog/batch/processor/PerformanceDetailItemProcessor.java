@@ -2,7 +2,7 @@ package com.stagelog.Stagelog.batch.processor;
 
 import com.stagelog.Stagelog.batch.client.KopisPerformanceDataProvider;
 import com.stagelog.Stagelog.domain.KopisPerformance;
-import com.stagelog.Stagelog.dto.PerformanceDetailResponseDto;
+import com.stagelog.Stagelog.dto.RealKopisPerformanceDetailResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;
@@ -21,7 +21,7 @@ public class PerformanceDetailItemProcessor implements ItemProcessor<KopisPerfor
         try {
             Thread.sleep(RATE_LIMIT_DELAY_MS);
 
-            PerformanceDetailResponseDto detailResponseDto = kopisPerformanceDataProvider.fetchPerformanceDetail(item.getKopisId());
+            RealKopisPerformanceDetailResponseDto detailResponseDto = kopisPerformanceDataProvider.fetchPerformanceDetail(item.getKopisId());
 
             if(detailResponseDto == null){
                 log.warn("상세정보를 찾을 수 없음: {}", item.getKopisId());

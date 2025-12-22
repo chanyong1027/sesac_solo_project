@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StageLog - 공연 관리</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            padding: 20px 30px;
+            background: #f9f9f9;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .controls {
+            padding: 20px 30px;
+            background: #fafafa;
+            border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #999;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 50px;
+            color: #999;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f5f5f5;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px;
+            font-weight: 600;
+            font-size: 13px;
+            color: #666;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: #fafafa;
+        }
+
+        .id-col { width: 60px; }
+        .poster-col { width: 80px; }
+        .title-col { width: 300px; }
+        .venue-col { width: 150px; }
+        .date-col { width: 180px; }
+        .artist-col { width: 200px; }
+        .action-col { width: 150px; }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn-save {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+
+        .btn-save:hover {
+            background: #5568d3;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+        }
+
+        .btn-save:disabled, .btn-delete:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-ongoing {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .badge-completed {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .badge-scheduled {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .poster-img {
+            width: 60px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #323232;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        .info-text {
+            font-size: 12px;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 20px;
+        }
+
+        .page-btn {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .page-btn:hover {
+            background: #f5f5f5;
+        }
+
+        .page-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎭 StageLog - 공연 관리</h1>
+            <p class="subtitle">공연 데이터를 관리하고 아티스트 정보를 수정하세요</p>
+        </header>
+
+        <div class="stats" id="stats">
+            <div class="stat-card">
+                <div class="stat-label">전체 공연</div>
+                <div class="stat-value" id="stat-total">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">아티스트 정보 있음</div>
+                <div class="stat-value" id="stat-with">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">아티스트 정보 없음</div>
+                <div class="stat-value" id="stat-without">-</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    id="search-input" 
+                    placeholder="제목 또는 아티스트명으로 검색..."
+                    onkeypress="if(event.key==='Enter') searchPerformances()"
+                />
+                <button class="btn btn-primary" onclick="searchPerformances()">
+                    검색
+                </button>
+            </div>
+            <button class="btn btn-secondary" onclick="loadPerformances('all')">
+                전체보기
+            </button>
+            <button class="btn btn-secondary" onclick="loadPerformances('no-artist')">
+                아티스트 없음만
+            </button>
+        </div>
+
+        <div class="content">
+            <div id="loading" class="loading" style="display: none;">
+                로딩 중...
+            </div>
+
+            <div id="empty" class="empty" style="display: none;">
+                데이터가 없습니다.
+            </div>
+
+            <div id="table-container" style="display: none;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="id-col">ID</th>
+                            <th class="poster-col">포스터</th>
+                            <th class="title-col">공연명</th>
+                            <th class="venue-col">장소</th>
+                            <th class="date-col">공연 기간</th>
+                            <th class="artist-col">아티스트명 (name_kr)</th>
+                            <th class="action-col">액션</th>
+                        </tr>
+                    </thead>
+                    <tbody id="performance-list">
+                    </tbody>
+                </table>
+
+                <div class="pagination" id="pagination">
+                    <button class="page-btn" onclick="prevPage()" id="prev-btn">이전</button>
+                    <span id="page-info">Page 1</span>
+                    <button class="page-btn" onclick="nextPage()" id="next-btn">다음</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api/admin/performances';
+        let currentPage = 0;
+        let currentMode = 'all'; // 'all', 'no-artist', 'search'
+        let searchKeyword = '';
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStats();
+            loadPerformances('all');
+        });
+
+        // 통계 로드
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE}/stats`);
+                const stats = await response.json();
+                
+                document.getElementById('stat-total').textContent = stats.total;
+                document.getElementById('stat-with').textContent = stats.withArtist;
+                document.getElementById('stat-without').textContent = stats.withoutArtist;
+            } catch (error) {
+                console.error('통계 로드 실패:', error);
+            }
+        }
+
+        // 공연 목록 로드
+        async function loadPerformances(mode) {
+            currentMode = mode;
+            currentPage = 0;
+            await fetchPerformances();
+        }
+
+        // 검색
+        async function searchPerformances() {
+            searchKeyword = document.getElementById('search-input').value.trim();
+            if (!searchKeyword) {
+                showToast('검색어를 입력하세요.');
+                return;
+            }
+            currentMode = 'search';
+            await fetchPerformances();
+        }
+
+        // 데이터 가져오기
+        async function fetchPerformances() {
+            const loading = document.getElementById('loading');
+            const empty = document.getElementById('empty');
+            const tableContainer = document.getElementById('table-container');
+            const performanceList = document.getElementById('performance-list');
+            
+            loading.style.display = 'block';
+            empty.style.display = 'none';
+            tableContainer.style.display = 'none';
+            
+            try {
+                let url;
+                if (currentMode === 'all') {
+                    url = `${API_BASE}?page=${currentPage}&size=50`;
+                } else if (currentMode === 'no-artist') {
+                    url = `${API_BASE}/no-artist`;
+                } else if (currentMode === 'search') {
+                    url = `${API_BASE}/search?keyword=${encodeURIComponent(searchKeyword)}`;
+                }
+                
+                const response = await fetch(url);
+                const performances = await response.json();
+                
+                loading.style.display = 'none';
+                
+                if (performances.length === 0) {
+                    empty.style.display = 'block';
+                    return;
+                }
+                
+                tableContainer.style.display = 'block';
+                performanceList.innerHTML = '';
+                
+                performances.forEach(perf => {
+                    const row = createPerformanceRow(perf);
+                    performanceList.appendChild(row);
+                });
+                
+                updatePagination(performances.length);
+                
+            } catch (error) {
+                loading.style.display = 'none';
+                showToast('데이터 로드 실패: ' + error.message);
+            }
+        }
+
+        // 공연 행 생성
+        function createPerformanceRow(perf) {
+            const tr = document.createElement('tr');
+            
+            // 포스터 이미지
+            const posterImg = perf.posterUrl 
+                ? `<img src="${perf.posterUrl}" class="poster-img" alt="poster" onerror="this.style.display='none'"/>`
+                : '<div class="poster-img" style="background:#eee;display:flex;align-items:center;justify-content:center;color:#999;">No Image</div>';
+            
+            // 상태 배지
+            const statusBadge = getStatusBadge(perf.status);
+            
+            // 날짜 포맷
+            const dateStr = `${perf.startDate || ''} ~ ${perf.endDate || ''}`;
+            
+            // 아티스트 정보
+            let artistInfo = '';
+            if (perf.artistNameEn) {
+                artistInfo = `<div class="info-text">Spotify: ${perf.artistNameEn}</div>`;
+            }
+            
+            tr.innerHTML = `
+                <td>${perf.id}</td>
+                <td>${posterImg}</td>
+                <td>
+                    <strong>${escapeHtml(perf.title)}</strong>
+                    <div class="info-text">${perf.kopisId}</div>
+                    ${statusBadge}
+                </td>
+                <td>${escapeHtml(perf.venue || '-')}</td>
+                <td>
+                    <div style="font-size:12px;">${dateStr}</div>
+                </td>
+                <td>
+                    <input 
+                        type="text" 
+                        id="artist-${perf.id}" 
+                        value="${escapeHtml(perf.artistNameKr || '')}"
+                        placeholder="아티스트명 입력"
+                    />
+                    ${artistInfo}
+                </td>
+                <td>
+                    <button 
+                        class="btn-save" 
+                        onclick="savePerformance(${perf.id})"
+                        id="save-btn-${perf.id}"
+                    >
+                        저장
+                    </button>
+                    <button 
+                        class="btn-delete" 
+                        onclick="deletePerformance(${perf.id})"
+                        id="del-btn-${perf.id}"
+                    >
+                        삭제
+                    </button>
+                </td>
+            `;
+            
+            return tr;
+        }
+
+        // 공연 저장
+        async function savePerformance(id) {
+            const input = document.getElementById(`artist-${id}`);
+            const btn = document.getElementById(`save-btn-${id}`);
+            const artistNameKr = input.value.trim();
+            
+            btn.disabled = true;
+            btn.textContent = '저장 중...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ artistNameKr: artistNameKr })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('저장 실패');
+                }
+                
+                showToast('✅ 저장되었습니다!');
+                loadStats();
+                
+            } catch (error) {
+                showToast('❌ 저장 실패: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '저장';
+            }
+        }
+
+        // 공연 삭제
+        async function deletePerformance(id) {
+            if (!confirm('정말 삭제하시겠습니까?')) {
+                return;
+            }
+            
+            const btn = document.getElementById(`del-btn-${id}`);
+            btn.disabled = true;
+            btn.textContent = '삭제 중...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('삭제 실패');
+                }
+                
+                showToast('✅ 삭제되었습니다!');
+                loadStats();
+                await fetchPerformances();
+                
+            } catch (error) {
+                showToast('❌ 삭제 실패: ' + error.message);
+                btn.disabled = false;
+                btn.textContent = '삭제';
+            }
+        }
+
+        // 페이지네이션
+        function updatePagination(count) {
+            const pageInfo = document.getElementById('page-info');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            
+            if (currentMode === 'all') {
+                pageInfo.textContent = `Page ${currentPage + 1}`;
+                prevBtn.disabled = currentPage === 0;
+                nextBtn.disabled = count < 50;
+            } else {
+                // 검색/필터 모드에서는 페이지네이션 숨김
+                document.getElementById('pagination').style.display = 'none';
+            }
+        }
+
+        function prevPage() {
+            if (currentPage > 0) {
+                currentPage--;
+                fetchPerformances();
+            }
+        }
+
+        function nextPage() {
+            currentPage++;
+            fetchPerformances();
+        }
+
+        // 상태 배지
+        function getStatusBadge(status) {
+            if (!status) return '';
+            
+            let badgeClass = 'badge-ongoing';
+            if (status.includes('완료')) {
+                badgeClass = 'badge-completed';
+            } else if (status.includes('예정')) {
+                badgeClass = 'badge-scheduled';
+            }
+            
+            return `<span class="badge ${badgeClass}">${status}</span>`;
+        }
+
+        // 토스트 메시지
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // HTML 이스케이프
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

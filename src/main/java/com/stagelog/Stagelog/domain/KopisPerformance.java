@@ -1,6 +1,6 @@
 package com.stagelog.Stagelog.domain;
 
-import com.stagelog.Stagelog.dto.PerformanceDetailResponseDto;
+import com.stagelog.Stagelog.dto.RealKopisPerformanceDetailResponseDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,7 +29,7 @@ public class KopisPerformance {
     @Column(name = "prfnm")
     private String title;
 
-    @Column(name = "poster")
+    @Column(name = "poster", length = 1000)
     private String posterUrl;
 
     @Column(name = "fcltynm")
@@ -47,6 +47,7 @@ public class KopisPerformance {
     @Column(name = "genrenm")
     private String genre;
 
+    @Builder.Default
     @Column(name = "has_detail")
     private Boolean hasDetail = false; // 상세 정보 수집 여부
 
@@ -55,13 +56,13 @@ public class KopisPerformance {
 
     // --------상세 정보로 받아 올 필드들--------
 
-    @Column(name = "prfcast")
+    @Column(name = "prfcast", columnDefinition = "TEXT")
     private String cast;
 
     @Column(name = "prfruntime")
     private String runtime;
 
-    @Column(name = "pcseguidance")
+    @Column(name = "pcseguidance", length = 1000)
     private String ticketPrice;
 
     @Column(name = "area")
@@ -79,10 +80,13 @@ public class KopisPerformance {
     @Column(name = "relatenm")
     private String ticketVendor;
 
-    @Column(name = "relateurl")
+    @Column(name = "relateurl", columnDefinition = "TEXT")
     private String ticketUrl;
 
-    public void updateDetailInfo(PerformanceDetailResponseDto detail) {
+    @Column(name = "refined")
+    private boolean isRefined = false;
+
+    public void updateDetailInfo(RealKopisPerformanceDetailResponseDto detail) {
         if (detail == null) {
             throw new IllegalArgumentException("상세 정보가 null일 수 없습니다");
         }
@@ -100,10 +104,10 @@ public class KopisPerformance {
         this.isFestival = detail.isFestival();
         this.isVisit = detail.isVisitPerformance();
         this.ticketVendor = detail.getRelates().stream()
-                .map(PerformanceDetailResponseDto.RelateDto::getRelatenm)
+                .map(RealKopisPerformanceDetailResponseDto.RelateDto::getRelatenm)
                 .collect(Collectors.joining(", "));
         this.ticketUrl = detail.getTicketLinks().stream()
-                .map(PerformanceDetailResponseDto.RelateDto::getRelateurl)
+                .map(RealKopisPerformanceDetailResponseDto.RelateDto::getRelateurl)
                 .filter(url -> url != null && !url.isEmpty())
                 .collect(Collectors.joining(", "));
     }
@@ -115,5 +119,13 @@ public class KopisPerformance {
 
     public void handleNoDetail() {
         this.hasDetail = true;
+    }
+
+    public void updateStatus(String prfstate) {
+        this.status = prfstate;
+    }
+
+    public void markAsRefined() {
+        this.isRefined = true;
     }
 }

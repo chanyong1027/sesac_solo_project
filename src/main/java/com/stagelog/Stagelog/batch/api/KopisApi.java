@@ -1,9 +1,9 @@
-package com.stagelog.Stagelog.api;
+package com.stagelog.Stagelog.batch.api;
 
 import com.stagelog.Stagelog.batch.dto.KopisPerformanceApiDto;
 import com.stagelog.Stagelog.dto.KopisPerformanceDetailResponseDto;
 import com.stagelog.Stagelog.dto.KopisPerformanceResponseDto;
-import com.stagelog.Stagelog.dto.PerformanceDetailResponseDto;
+import com.stagelog.Stagelog.dto.RealKopisPerformanceDetailResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -63,7 +63,7 @@ public class KopisApi {
         }
     }
 
-    public PerformanceDetailResponseDto fetchMusicalDetail(String kopisId) {
+    public RealKopisPerformanceDetailResponseDto fetchMusicalDetail(String kopisId) {
         try {
             String uri = UriComponentsBuilder
                     .fromPath("/openApi/restful/pblprfr/{mt20id}")
@@ -82,7 +82,7 @@ public class KopisApi {
                 log.warn("KOPIS API 응답이 null입니다: kopisId={}", kopisId);
                 return null;
             }
-            PerformanceDetailResponseDto detail = response.getFirstDetail();
+            RealKopisPerformanceDetailResponseDto detail = response.getFirstDetail();
 
             if (detail == null) {
                 log.warn("상세 정보가 비어있습니다: kopisId={}", kopisId);

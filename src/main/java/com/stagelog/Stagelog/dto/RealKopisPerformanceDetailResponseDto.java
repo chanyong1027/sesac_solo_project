@@ -16,7 +16,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PerformanceDetailResponseDto {
+public class RealKopisPerformanceDetailResponseDto {
 
     private static final DateTimeFormatter KOPIS_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
