@@ -75,18 +75,20 @@ public class SpotifyArtistManualMatchService {
 
             var spotifyArtist = response.getArtists().getItems().get(0);
 
-            // RefinedPerformance에 직접 저장
-            performance.setArtistNameEn(spotifyArtist.getName());
+            // RefinedPerformance에 Spotify 정보 저장
+            String artistNameEn = spotifyArtist.getName();
+            String genres = null;
 
             // 장르 저장
             if (spotifyArtist.getGenres() != null && !spotifyArtist.getGenres().isEmpty()) {
                 try {
-                    String genres = objectMapper.writeValueAsString(spotifyArtist.getGenres());
-                    performance.setArtistGenres(genres);
+                    genres = objectMapper.writeValueAsString(spotifyArtist.getGenres());
                 } catch (JsonProcessingException e) {
                     log.warn("장르 JSON 변환 실패: {}", performance.getArtistNameKr());
                 }
             }
+
+            performance.updateSpotifyArtistInfo(artistNameEn, genres);
 
             return true;
 

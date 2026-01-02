@@ -1,6 +1,10 @@
 package com.stagelog.Stagelog.api.auth.service;
 
 import com.stagelog.Stagelog.domain.User;
+import com.stagelog.Stagelog.global.exception.DuplicateEntityException;
+import com.stagelog.Stagelog.global.exception.EntityNotFoundException;
+import com.stagelog.Stagelog.global.exception.ErrorCode;
+import com.stagelog.Stagelog.global.exception.UnauthorizedException;
 import com.stagelog.Stagelog.repository.UserRepository;
 import com.stagelog.Stagelog.global.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -18,24 +22,20 @@ public class AuthService {
     @Transactional
     public void signUp(String userId, String password, String email, String username) {
         if (userRepository.existsByUserId(userId)) {
-            throw new RuntimeException("이미 존재하는 아이디입니다.");
+            throw new DuplicateEntityException(ErrorCode.USER_ALREADY_EXISTS);
         }
 
-        userRepository.findByUserId(userId)
-                .ifPresent(user -> {
-                    throw new RuntimeException("이미 존재하는 유저입니다.");
-                });
         String encodedPassword = passwordEncoder.encode(password);
         userRepository.save(User.create(userId, encodedPassword, email, username));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public String logIn(String userId, String password) {
         User user = userRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+            throw new UnauthorizedException(ErrorCode.INVALID_PASSWORD);
         }
         return jwtTokenProvider.createToken(user.getUserId(), user.getUsername());
     }

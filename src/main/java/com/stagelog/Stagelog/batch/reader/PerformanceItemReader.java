@@ -2,6 +2,8 @@ package com.stagelog.Stagelog.batch.reader;
 
 import com.stagelog.Stagelog.batch.client.KopisPerformanceDataProvider;
 import com.stagelog.Stagelog.batch.dto.KopisPerformanceApiDto;
+import com.stagelog.Stagelog.global.exception.BatchProcessException;
+import com.stagelog.Stagelog.global.exception.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemReader;
@@ -87,7 +89,7 @@ public class PerformanceItemReader implements ItemReader<KopisPerformanceApiDto>
             fetchDataForCurrentPeriod();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException("API 요청 대기 중 인터럽트 발생", e);
+            throw new BatchProcessException(ErrorCode.BATCH_INTERRUPTED, e);
         } catch (Exception e) {
             log.error("API 호출 중 에러 발생", e);
             periodCursor.moveToNextMonth();

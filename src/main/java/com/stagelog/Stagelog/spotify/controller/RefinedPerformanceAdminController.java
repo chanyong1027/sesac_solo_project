@@ -1,6 +1,8 @@
 package com.stagelog.Stagelog.spotify.controller;
 
 import com.stagelog.Stagelog.domain.RefinedPerformance;
+import com.stagelog.Stagelog.global.exception.EntityNotFoundException;
+import com.stagelog.Stagelog.global.exception.ErrorCode;
 import com.stagelog.Stagelog.repository.RefinedPerformanceRepository;
 import com.stagelog.Stagelog.spotify.dto.RefinedPerformanceAdminDto;
 import com.stagelog.Stagelog.spotify.service.SpotifyArtistManualMatchService;
@@ -93,11 +95,11 @@ public class RefinedPerformanceAdminController {
             @RequestBody RefinedPerformanceAdminDto.UpdateRequest request
     ) {
         RefinedPerformance performance = performanceRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Performance not found: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.PERFORMANCE_NOT_FOUND));
 
         // artist_name_kr 업데이트
         if (request.getArtistNameKr() != null) {
-            performance.setArtistNameKr(request.getArtistNameKr());
+            performance.updateArtistNameKr(request.getArtistNameKr());
         }
 
         performanceRepository.save(performance);
@@ -111,7 +113,7 @@ public class RefinedPerformanceAdminController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePerformance(@PathVariable Long id) {
         if (!performanceRepository.existsById(id)) {
-            throw new RuntimeException("Performance not found: " + id);
+            throw new EntityNotFoundException(ErrorCode.PERFORMANCE_NOT_FOUND);
         }
 
         performanceRepository.deleteById(id);

@@ -84,9 +84,9 @@ public class KopisFilterService {
         int excluded = performances.size() - filtered.size();
         double excludeRate = (excluded * 100.0) / performances.size();
 
-        log.info("필터링 완료: {}개 제외 ({:.2f}%), {}개 남음 ({:.2f}%)",
-                excluded, excludeRate,
-                filtered.size(), 100 - excludeRate);
+        log.info("필터링 완료: {}개 제외 ({}%), {}개 남음 ({}%)",
+                excluded, String.format("%.2f", excludeRate),
+                filtered.size(), String.format("%.2f", 100 - excludeRate));
 
         return filtered;
     }

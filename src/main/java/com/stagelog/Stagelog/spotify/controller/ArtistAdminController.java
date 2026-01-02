@@ -1,6 +1,8 @@
 package com.stagelog.Stagelog.spotify.controller;
 
 import com.stagelog.Stagelog.domain.Artist;
+import com.stagelog.Stagelog.global.exception.EntityNotFoundException;
+import com.stagelog.Stagelog.global.exception.ErrorCode;
 import com.stagelog.Stagelog.repository.ArtistRepository;
 import com.stagelog.Stagelog.service.MigrationService;
 import com.stagelog.Stagelog.spotify.dto.ArtistAdminDto;
@@ -45,7 +47,7 @@ public class ArtistAdminController {
             @RequestBody ArtistAdminDto.UpdateRequest request
     ) {
         Artist artist = artistRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Artist not found"));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ARTIST_NOT_FOUND));
 
         // (1) 한글 이름 업데이트 (입력값이 있을 때만)
         if (request.getNameKr() != null && !request.getNameKr().isBlank()) {

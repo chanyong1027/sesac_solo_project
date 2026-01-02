@@ -4,6 +4,8 @@ import com.stagelog.Stagelog.domain.RefinedPerformance;
 import com.stagelog.Stagelog.dto.PerformanceCalenderResponse;
 import com.stagelog.Stagelog.dto.PerformanceDetailResponse;
 import com.stagelog.Stagelog.dto.PerformanceListResponse;
+import com.stagelog.Stagelog.global.exception.EntityNotFoundException;
+import com.stagelog.Stagelog.global.exception.ErrorCode;
 import com.stagelog.Stagelog.repository.RefinedPerformanceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -52,9 +54,10 @@ public class RefinedPerformanceService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public PerformanceDetailResponse getPerformanceDetail(Long performanceId) {
         RefinedPerformance performance = performanceRepository.findById(performanceId)
-                .orElseThrow(() -> new RuntimeException("performance not found"));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.PERFORMANCE_NOT_FOUND));
         return PerformanceDetailResponse.from(performance);
     }
 }

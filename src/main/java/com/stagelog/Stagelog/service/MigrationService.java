@@ -57,7 +57,7 @@ public class MigrationService {
             }
 
             // 4. 공연 엔티티에 새로 만든 아티스트를 연결
-            pf.setArtistMapping(artistMap.get(artistKey));
+            pf.linkArtistMapping(artistMap.get(artistKey));
         }
     }
 

@@ -3,6 +3,8 @@ package com.stagelog.Stagelog.batch.processor;
 import com.stagelog.Stagelog.batch.client.KopisPerformanceDataProvider;
 import com.stagelog.Stagelog.domain.KopisPerformance;
 import com.stagelog.Stagelog.dto.RealKopisPerformanceDetailResponseDto;
+import com.stagelog.Stagelog.global.exception.BatchProcessException;
+import com.stagelog.Stagelog.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;
@@ -33,7 +35,7 @@ public class PerformanceDetailItemProcessor implements ItemProcessor<KopisPerfor
             return item;
         }catch (InterruptedException e){
             Thread.currentThread().interrupt();
-            throw new RuntimeException("Rate limiting 중 인터럽트 발생");
+            throw new BatchProcessException(ErrorCode.BATCH_INTERRUPTED, e);
         }
     }
 }

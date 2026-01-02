@@ -1,12 +1,12 @@
 package com.stagelog.Stagelog.controller;
 
-import com.stagelog.Stagelog.domain.Review;
 import com.stagelog.Stagelog.dto.ReviewCreateRequest;
 import com.stagelog.Stagelog.dto.ReviewDetailResponse;
 import com.stagelog.Stagelog.dto.ReviewListResponse;
 import com.stagelog.Stagelog.dto.ReviewUpdateRequest;
 import com.stagelog.Stagelog.global.security.service.CustomUserDetails;
 import com.stagelog.Stagelog.service.ReviewService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,7 @@ public class ReviewController {
     @PostMapping
     public ResponseEntity<Long> createReview(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody ReviewCreateRequest request) {
+            @Valid @RequestBody ReviewCreateRequest request) {
         Long userId = userDetails.getUser().getId();
         Long reviewId = reviewService.createReview(userId, request);
 
@@ -35,8 +35,7 @@ public class ReviewController {
     public ResponseEntity<List<ReviewListResponse>> getAllReviews(@AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUser().getId();
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(reviewService.getMyReviews(userId));
+        return ResponseEntity.ok(reviewService.getMyReviews(userId));
     }
 
     @GetMapping("/{reviewId}")
@@ -56,7 +55,7 @@ public class ReviewController {
     public ResponseEntity<ReviewDetailResponse> updateReview(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long reviewId,
-            @RequestBody ReviewUpdateRequest request
+            @Valid @RequestBody ReviewUpdateRequest request
     ){
         Long userId = userDetails.getUser().getId();
 

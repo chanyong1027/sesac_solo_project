@@ -14,4 +14,7 @@ public interface KopisPerformanceRepository extends JpaRepository<KopisPerforman
 
     @Query("SELECT k FROM KopisPerformance k WHERE k.hasDetail = true AND k.isRefined = false")
     List<KopisPerformance> findByHasDetailTrueAndIsRefinedFalse();
+
+    @Query("SELECT k FROM KopisPerformance k WHERE k.hasDetail = true")
+    List<KopisPerformance> findByHasDetailTrue();
 }

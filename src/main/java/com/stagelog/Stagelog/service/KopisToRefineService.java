@@ -76,9 +76,24 @@ public class KopisToRefineService {
     }
 
     private void updateRefined(RefinedPerformance existing, RefinedPerformance newValue) {
-        existing.setTitle(newValue.getTitle());
-        existing.setStatus(newValue.getStatus());
-        existing.setEndDate(newValue.getEndDate());
-        // ... 필요한 필드만 업데이트 수행
+        existing.syncWithKopisData(
+                newValue.getTitle(),
+                newValue.getPosterUrl(),
+                newValue.getVenue(),
+                newValue.getStatus(),
+                newValue.getStartDate(),
+                newValue.getEndDate(),
+                newValue.getGenre(),
+                newValue.isHasDetail(),
+                newValue.getCast(),
+                newValue.getRuntime(),
+                newValue.getTicketPrice(),
+                newValue.getArea(),
+                newValue.getPerformanceStartTime(),
+                newValue.isVisit(),
+                newValue.isFestival(),
+                newValue.getTicketVendor(),
+                newValue.getTicketUrl()
+        );
     }
 }

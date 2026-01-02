@@ -1,6 +1,8 @@
 package com.stagelog.Stagelog.domain;
 
 import com.stagelog.Stagelog.dto.RealKopisPerformanceDetailResponseDto;
+import com.stagelog.Stagelog.global.exception.ErrorCode;
+import com.stagelog.Stagelog.global.exception.InvalidInputException;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -88,7 +90,7 @@ public class KopisPerformance {
 
     public void updateDetailInfo(RealKopisPerformanceDetailResponseDto detail) {
         if (detail == null) {
-            throw new IllegalArgumentException("상세 정보가 null일 수 없습니다");
+            throw new InvalidInputException(ErrorCode.PERFORMANCE_DETAIL_NULL);
         }
 
         this.title = detail.getPrfnm();

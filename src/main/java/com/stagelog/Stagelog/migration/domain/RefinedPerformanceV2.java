@@ -1,5 +1,6 @@
-package com.stagelog.Stagelog.domain;
+package com.stagelog.Stagelog.migration.domain;
 
+import com.stagelog.Stagelog.domain.ArtistMapping;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -7,11 +8,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "refined_performance_v2")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-public class RefinedPerformance {
+public class RefinedPerformanceV2 {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,7 +45,7 @@ public class RefinedPerformance {
 
     @Builder.Default
     @Column(name = "has_detail")
-    private boolean hasDetail = false; // 상세 정보 수집 여부
+    private boolean hasDetail = false;
 
     @Column(name = "prfcast", columnDefinition = "TEXT")
     private String cast;
@@ -73,19 +75,42 @@ public class RefinedPerformance {
     private String ticketUrl;
 
     // ============================================================
-    // 아티스트 정보 (artist 테이블에서 가져옴)
+    // 아티스트 정보 (기존과 동일)
     // ============================================================
     @Column(name = "artist_id")
     private Long artistId;
 
     @Column(name = "artist_name_kr", length = 200)
-    private String artistNameKr;  // 한글 아티스트명
+    private String artistNameKr;
 
     @Column(name = "artist_name_en", length = 200)
-    private String artistNameEn;  // 영문 아티스트명
+    private String artistNameEn;
 
     @Column(name = "artist_genres", columnDefinition = "TEXT")
-    private String artistGenres;  // Spotify 장르 정보 (JSON 배열)
+    private String artistGenres;
+
+    // ============================================================
+    // 화이트리스트 매칭 추적 정보 (신규)
+    // ============================================================
+
+    /**
+     * 어떤 TargetArtistV2에 의해 매칭되었는지
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "matched_artist_id")
+    private TargetArtistV2 matchedArtist;
+
+    /**
+     * 어떤 키워드로 매칭되었는지 (예: "잔나비", "JANNABI")
+     */
+    @Column(name = "matched_keyword", length = 200)
+    private String matchedKeyword;
+
+    /**
+     * 필터링 상태 (WHITELIST_MATCHED, MANUAL_ADDED 등)
+     */
+    @Column(name = "filter_status", length = 20)
+    private String filterStatus = "WHITELIST_MATCHED";
 
     // ==== 메타 정보 ====
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -114,7 +139,16 @@ public class RefinedPerformance {
     // ============================================================
 
     /**
-     * 한글 아티스트명 수정 (관리자 수정용)
+     * 매칭 정보 설정
+     */
+    public void setMatchingInfo(TargetArtistV2 matchedArtist, String matchedKeyword) {
+        this.matchedArtist = matchedArtist;
+        this.matchedKeyword = matchedKeyword;
+        this.filterStatus = "WHITELIST_MATCHED";
+    }
+
+    /**
+     * 한글 아티스트명 수정
      */
     public void updateArtistNameKr(String artistNameKr) {
         this.artistNameKr = artistNameKr;
@@ -136,26 +170,14 @@ public class RefinedPerformance {
     }
 
     /**
-     * KOPIS 원본 데이터와 동기화 (아티스트 정보 제외)
+     * KOPIS 원본 데이터와 동기화
      */
     public void syncWithKopisData(
-            String title,
-            String posterUrl,
-            String venue,
-            String status,
-            LocalDate startDate,
-            LocalDate endDate,
-            String genre,
-            boolean hasDetail,
-            String cast,
-            String runtime,
-            String ticketPrice,
-            String area,
-            String performanceStartTime,
-            boolean isVisit,
-            boolean isFestival,
-            String ticketVendor,
-            String ticketUrl
+            String title, String posterUrl, String venue, String status,
+            LocalDate startDate, LocalDate endDate, String genre, boolean hasDetail,
+            String cast, String runtime, String ticketPrice, String area,
+            String performanceStartTime, boolean isVisit, boolean isFestival,
+            String ticketVendor, String ticketUrl
     ) {
         this.title = title;
         this.posterUrl = posterUrl;

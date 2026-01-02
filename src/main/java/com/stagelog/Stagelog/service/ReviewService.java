@@ -8,6 +8,9 @@ import com.stagelog.Stagelog.dto.ReviewCreateRequest;
 import com.stagelog.Stagelog.dto.ReviewDetailResponse;
 import com.stagelog.Stagelog.dto.ReviewListResponse;
 import com.stagelog.Stagelog.dto.ReviewUpdateRequest;
+import com.stagelog.Stagelog.global.exception.EntityNotFoundException;
+import com.stagelog.Stagelog.global.exception.ErrorCode;
+import com.stagelog.Stagelog.global.exception.UnauthorizedException;
 import com.stagelog.Stagelog.repository.ReviewRepository;
 import com.stagelog.Stagelog.repository.UserRepository;
 import jakarta.validation.constraints.NotBlank;
@@ -25,9 +28,9 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
 
-    public Long createReview(Long userId, ReviewCreateRequest request) { // 파라미터를 DTO로 받으면 더 깔끔합니다.
+    public Long createReview(Long userId, ReviewCreateRequest request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자가 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
         Playlist playlist = createPlaylist(request.getPlaylistTitle(), request.getTracks());
 
@@ -42,7 +45,7 @@ public class ReviewService {
 
     private Playlist createPlaylist(String playlistTitle, List<ReviewCreateRequest.TrackRequest> trackRequests) {
         if (trackRequests == null || trackRequests.isEmpty()) {
-            return null; // 또는 정책에 따라 예외 발생
+            return null;
         }
 
         // playlistTitle이 없으면 기본값 사용
@@ -52,15 +55,9 @@ public class ReviewService {
 
         Playlist playlist = new Playlist(title);
 
-        for (ReviewCreateRequest.TrackRequest t : trackRequests) {
-            Track track = new Track(
-                    t.getSpotifyId(),
-                    t.getTitle(),
-                    t.getArtistName(),
-                    t.getAlbumImageUrl(),
-                    t.getSpotifyUri(),
-                    t.getExternalUrl(),
-                    t.getDurationMs());
+        // 정적 팩토리 메서드 사용
+        for (ReviewCreateRequest.TrackRequest trackRequest : trackRequests) {
+            Track track = Track.from(trackRequest);
             playlist.addTrack(track);
         }
         return playlist;
@@ -79,7 +76,7 @@ public class ReviewService {
     @Transactional
     public void deleteReview(Long userId, Long reviewId) {
         Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 리뷰입니다."));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.REVIEW_NOT_FOUND));
 
         validateOwner(userId, review);
         reviewRepository.delete(review);
@@ -88,22 +85,16 @@ public class ReviewService {
     @Transactional
     public ReviewDetailResponse updateReview(Long userId, Long reviewId, ReviewUpdateRequest request) {
         Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 리뷰입니다."));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.REVIEW_NOT_FOUND));
         validateOwner(userId, review);
 
+        // 정적 팩토리 메서드 사용
         List<Track> newTracks = Optional.ofNullable(request.getTracks())
                 .orElse(Collections.emptyList())
                 .stream()
-                .map(trackDto -> Track.builder()
-                        .spotifyId(trackDto.getSpotifyId())
-                        .title(trackDto.getTitle())
-                        .artistName(trackDto.getArtistName())
-                        .albumImageUrl(trackDto.getAlbumImageUrl())
-                        .spotifyUri(trackDto.getSpotifyUri())
-                        .externalUrl(trackDto.getExternalUrl())
-                        .durationMs(trackDto.getDurationMs())
-                        .build())
+                .map(Track::from)
                 .toList();
+
         review.update(request.getTitle(), request.getContent(), request.getPlaylistTitle(), newTracks);
         return ReviewDetailResponse.from(review);
     }
@@ -111,7 +102,7 @@ public class ReviewService {
     @Transactional(readOnly = true)
     public ReviewDetailResponse getReviewDetail(Long userId, Long reviewId) {
         Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 리뷰입니다."));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.REVIEW_NOT_FOUND));
 
         validateOwner(userId, review);
         return ReviewDetailResponse.from(review);
@@ -119,7 +110,7 @@ public class ReviewService {
 
     private void validateOwner(Long userId, Review review) {
         if (!review.getUser().getId().equals(userId)) {
-            throw new IllegalArgumentException("권한이 없습니다.");
+            throw new UnauthorizedException(ErrorCode.REVIEW_ACCESS_DENIED);
         }
     }
 }

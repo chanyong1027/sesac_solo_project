@@ -6,6 +6,8 @@ import com.stagelog.Stagelog.domain.User;
 import com.stagelog.Stagelog.dto.IPCreateRequest;
 import com.stagelog.Stagelog.dto.IPCreateResponse;
 import com.stagelog.Stagelog.dto.IPListResponse;
+import com.stagelog.Stagelog.global.exception.EntityNotFoundException;
+import com.stagelog.Stagelog.global.exception.ErrorCode;
 import com.stagelog.Stagelog.repository.InterestedPerformanceRepository;
 import com.stagelog.Stagelog.repository.RefinedPerformanceRepository;
 import com.stagelog.Stagelog.repository.UserRepository;
@@ -26,9 +28,9 @@ public class InterestedPerformanceService {
     @Transactional
     public IPCreateResponse create(Long userId, IPCreateRequest request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
         RefinedPerformance performance = performanceRepository.findById(request.getPerformanceId())
-                .orElseThrow(() -> new IllegalArgumentException("공연을 찾을 수 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.PERFORMANCE_NOT_FOUND));
 
         InterestedPerformance ip = InterestedPerformance.create(user, performance);
         InterestedPerformance savedIp = interestedPerformanceRepository.save(ip);
@@ -45,7 +47,7 @@ public class InterestedPerformanceService {
     @Transactional
     public Long delete(Long userId, Long performanceId) {
         if (!interestedPerformanceRepository.existsByUserIdAndPerformanceId(userId, performanceId)) {
-            throw new IllegalArgumentException("관심 등록되지 않은 공연입니다.");
+            throw new EntityNotFoundException(ErrorCode.INTERESTED_PERFORMANCE_NOT_FOUND);
         }
         interestedPerformanceRepository.deleteByUserIdAndPerformanceId(userId, performanceId);
         return performanceId;

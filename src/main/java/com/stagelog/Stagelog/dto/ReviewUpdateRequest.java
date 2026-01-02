@@ -23,11 +23,15 @@ public class ReviewUpdateRequest {
     @Getter
     @NoArgsConstructor
     public static class TrackRequest {
-        @NotBlank
+        @NotBlank(message = "Spotify ID는 필수입니다.")
         private String spotifyId;
 
+        @NotBlank(message = "트랙 제목은 필수입니다.")
         private String title;
+
+        @NotBlank(message = "아티스트명은 필수입니다.")
         private String artistName;
+
         private String albumImageUrl;
         private String previewUrl;
         private String spotifyUri;

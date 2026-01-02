@@ -1,5 +1,7 @@
 package com.stagelog.Stagelog.domain;
 
+import com.stagelog.Stagelog.global.exception.ErrorCode;
+import com.stagelog.Stagelog.global.exception.InvalidInputException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -7,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Entity
 @Getter
@@ -53,13 +56,16 @@ public class User {
 
     private static void validateLoginId(String loginId) {
         if (loginId == null || loginId.isEmpty()) {
-            throw new IllegalArgumentException("로그인 id는 필수입니다.");
+            throw new InvalidInputException(ErrorCode.INVALID_USER_ID);
         }
     }
 
+    private static final Pattern EMAIL_PATTERN =
+            Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+
     private static void validateEmail(String email) {
-        if (email == null || !email.contains("@")) {
-            throw new IllegalArgumentException("올바르지 않은 이메일 형식입니다.");
+        if (email == null || !EMAIL_PATTERN.matcher(email).matches()) {
+            throw new InvalidInputException(ErrorCode.INVALID_EMAIL_FORMAT);
         }
     }
 }

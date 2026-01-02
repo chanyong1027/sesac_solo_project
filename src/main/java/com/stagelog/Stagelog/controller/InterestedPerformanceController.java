@@ -5,6 +5,7 @@ import com.stagelog.Stagelog.dto.IPCreateResponse;
 import com.stagelog.Stagelog.dto.IPListResponse;
 import com.stagelog.Stagelog.global.security.service.CustomUserDetails;
 import com.stagelog.Stagelog.service.InterestedPerformanceService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class InterestedPerformanceController {
     @PostMapping()
     public ResponseEntity<IPCreateResponse> createIP(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody IPCreateRequest ipCreateRequest) {
+            @Valid @RequestBody IPCreateRequest ipCreateRequest) {
         Long userId = userDetails.getUser().getId();
 
         interestedPerformanceService.create(userId, ipCreateRequest);

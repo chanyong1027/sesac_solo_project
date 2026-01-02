@@ -30,7 +30,7 @@ public class RefinedPerformanceController {
     }
 
     @GetMapping("/calendar")
-    public ResponseEntity<List<PerformanceCalenderResponse>> getCalender(
+    public ResponseEntity<List<PerformanceCalenderResponse>> getCalendar(
             @RequestParam int year,
             @RequestParam int month
     ){

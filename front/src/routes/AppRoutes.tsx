@@ -43,42 +43,14 @@ const AppRoutes: React.FC = () => {
     <BrowserRouter>
       <Routes>
         {/* Public Routes */}
+        <Route path={ROUTES.HOME} element={<HomePage />} />
         <Route path={ROUTES.LOGIN} element={<LoginPage />} />
         <Route path={ROUTES.SIGNUP} element={<SignupPage />} />
 
-        {/* Protected Routes - 공연 관련 */}
-        <Route
-          path={ROUTES.HOME}
-          element={
-            <ProtectedRoute>
-              <HomePage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path={ROUTES.PERFORMANCES}
-          element={
-            <ProtectedRoute>
-              <PerformanceListPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path={ROUTES.CALENDAR}
-          element={
-            <ProtectedRoute>
-              <CalendarPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/performances/:id"
-          element={
-            <ProtectedRoute>
-              <PerformanceDetailPage />
-            </ProtectedRoute>
-          }
-        />
+        {/* Public Routes - 공연 관련 (로그인 없이 조회 가능) */}
+        <Route path={ROUTES.PERFORMANCES} element={<PerformanceListPage />} />
+        <Route path={ROUTES.CALENDAR} element={<CalendarPage />} />
+        <Route path="/performances/:id" element={<PerformanceDetailPage />} />
 
         {/* Protected Routes - 리뷰 관련 */}
         <Route
