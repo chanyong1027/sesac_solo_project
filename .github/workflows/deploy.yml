@@ -19,7 +19,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+        run: chmod +x gradlew && ./gradlew bootJar
 
       - name: Build with Gradle
         run: ./gradlew clean build -x test # 테스트 제외 빌드 (필요시 수정)
