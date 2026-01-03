@@ -1,6 +1,6 @@
 name: Java CI/CD with Docker and EC2
 
-# retry
+# retry2
 on:
   push:
     branches: [ "main" ] # main 브랜치에 push되면 실행
